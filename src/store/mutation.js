@@ -1,45 +1,45 @@
 const mutations = {
-    changeMusicUrl(state,url){
+    changeMusicUrl(state, url) {
         state.globalMusicUrl = url
     },
-    changeMusicInfo(state,info){
+    changeMusicInfo(state, info) {
         state.globalMusicInfo = info
     },
-    changeCurrentTime(state,time){
+    changeCurrentTime(state, time) {
         state.globalCurrentTime = time
     },
-    changeMusicStatus(state,status){
+    changeMusicStatus(state, status) {
         state.isMusicPaused = status
     },
-    changeMusicQueue(state,obj){
+    changeMusicQueue(state, obj) {
         let ids = []
         for (const item of state.musicQueue) {
             ids.push(item.id)
         }
-        if(!ids.includes(obj.id))
+        if (!ids.includes(obj.id))
             state.musicQueue.push(obj)
     },
-    deleteMusic(state,id){
+    deleteMusic(state, id) {
         let queue = state.musicQueue
-        for(let i=0;i<queue.length;i++){
-            if(queue[i].id === id){
-                queue.splice(i,1)
+        for (let i = 0; i < queue.length; i++) {
+            if (queue[i].id === id) {
+                queue.splice(i, 1)
             }
         }
     },
-    clearMusicQueue(state){
+    clearMusicQueue(state) {
         state.musicQueue = []
     },
-    changeNowIndex(state,index){
+    changeNowIndex(state, index) {
         state.nowIndex = index
     },
-    deleteToNext(state){
+    deleteToNext(state) {
         state.deleteToNext = !state.deleteToNext
     },
-    changeQueuePos(state,pos){
+    changeQueuePos(state, pos) {
         state.queuePos = pos
     },
-    changeQueueStyle(state,status){
+    changeQueueStyle(state, status) {
         state.queueStyle = status
     },
 }

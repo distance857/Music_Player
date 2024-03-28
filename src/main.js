@@ -11,20 +11,24 @@ Vue.config.productionTip = false
 
 Vue.use(ElementUI)
 
-Vue.use(Vuelazyload,{
-  preLoad:1.3,
+Vue.use(Vuelazyload, {
+  preLoad: 1.3,
   loading: require('./assets/imgs/loading.png'),
-  attempt:2
+  attempt: 2
 })
 
-console.log = function(){}
 
-console.info(`%c
-欢迎使用小陈音乐！
-作者：小陈同学吗
-GitHub：https://github.com/MrRainbowYoo/Music_Player
-歌曲来源于网易云音乐(https://music.163.com)
-* 本项目仅供个人学习研究使用，禁止用于商业或非法用途。`,`color:#2980b9`)
+//引入 封装好的请求
+import { postRequest } from '@/utils/request';
+import { putRequest } from '@/utils/request';
+import { getRequest } from '@/utils/request';
+import { deleteRequest } from '@/utils/request';
+//插件形式使用请求
+Vue.prototype.postRequest = postRequest;
+Vue.prototype.putRequest = putRequest;
+Vue.prototype.getRequest = getRequest;
+Vue.prototype.deleteRequest = deleteRequest;
+
 
 new Vue({
   router,

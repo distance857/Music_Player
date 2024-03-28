@@ -12,9 +12,6 @@
       <Queue v-show="showQueue"></Queue>
     </transition>
     <Bottom></Bottom>
-    <div style="fontSize:12px; position: absolute; bottom: 10%;left:10px;zIndex: -1;">
-      备案号：<a href="https://beian.miit.gov.cn" target="_blank">浙ICP备19010344号-1</a>
-    </div>
   </div>
 </template>
 
@@ -34,65 +31,68 @@ export default {
     SongDetail,
     Queue
   },
-  data(){
+  data() {
     return {
-      show:true,
-      showQueue:false
+      show: true,
+      showQueue: false
     }
   }
 }
 </script>
 
 <style>
-  *{
-    margin: 0;
-    padding: 0;
-  }
+* {
+  margin: 0;
+  padding: 0;
+}
 
-  #app {
-    height: 100vh;
-    display: flex;
-    flex-direction: column;
-    min-width: 500px;
-  }
+#app {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  min-width: 500px;
+}
 
-  .header {
-    height: 60px;
-    position: relative;
-    top: 0;
-    left: 0;
-    right: 0;
-  }
+.header {
+  height: 60px;
+  position: relative;
+  top: 0;
+  left: 0;
+  right: 0;
+}
 
-  .bottom {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 60px;
-  }
+.bottom {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 60px;
+}
 
-  .index {
-    position: fixed;
-    top: 60px;
-    bottom: 60px;
-    left: 0;
-    right: 0;
-  }
+.index {
+  position: fixed;
+  top: 60px;
+  bottom: 60px;
+  left: 0;
+  right: 0;
+}
 
-  /* 去除scrollbar横向滚动条 */
-  .el-scrollbar__wrap {
-      overflow-x: hidden !important;
-  }
+/* 去除scrollbar横向滚动条 */
+.el-scrollbar__wrap {
+  overflow-x: hidden !important;
+}
 
-  .fade-enter-active, .fade-leave-active {
-      transition: transform .5s
-  }
-  .fade-enter, .fade-leave-active {
-    transform: translate3d(0,100%,0);
-  }
+.fade-enter-active,
+.fade-leave-active {
+  transition: transform .5s
+}
 
-  .el-loading-spinner .path {
-    stroke: rgb(236, 65, 65) !important;
-  }
+.fade-enter,
+.fade-leave-active {
+  transform: translate3d(0, 100%, 0);
+}
+
+.el-loading-spinner .path {
+  stroke: rgb(236, 65, 65) !important;
+}
 </style>

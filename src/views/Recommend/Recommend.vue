@@ -1,290 +1,179 @@
 <template>
   <div class="recommend" v-loading="loading">
-    <div class="top-card-wrap">
-      <img :src="highQuality.coverImgUrl" class="bg-blur" alt="bg-blur">
-      <div class="top-card">
-        <div class="img-wrap">
-          <img :src="highQuality.coverImgUrl" alt="img">
-        </div>
-        <div class="card-content">
-          <div class="card-tag">精品歌单</div>
-          <div class="card-title">{{highQuality.name}}</div>
-          <div class="card-info">{{highQuality.description}}</div>
-        </div>
-      </div>
-    </div>
     <div class="tab-container">
-      <div class="tab-bar">
-        <ul>
-          <li :class="item == tabActive?'tab-item active':'tab-item'" v-for="(item,index) in tabItems" :key="index" @click="changeActive(item)">{{item}}</li>
-        </ul>
+      <div class="songs-table">
+        <el-table :data="tableData" stripe style="width: 100%" @row-dblclick="play">
+
+          <el-table-column type="index" width="50"></el-table-column>
+
+          <el-table-column width="100">
+            <template slot-scope="scope">
+              <div class="img-wrap">
+                <!-- <img v-lazy="scope.row.imgUrl" alt=""> -->
+                <p class="iconfont icon-play" @click="play(scope.row)"></p>
+              </div>
+            </template>
+
+          </el-table-column>
+          <el-table-column prop="songName" label="音乐标题" width=""></el-table-column>
+          <el-table-column label="歌手" width="" prop="artistname">
+          </el-table-column>
+          <el-table-column prop="duration" label="时长" width="100"></el-table-column>
+        </el-table>
+
       </div>
-      <div class="tab-content">
-        <div class="songs-wrap">
-            <div class="list">
-                <ul>
-                    <li class="iconfont icon-play" v-for="(item,index) in songLists" :key="index" @click="toPlaylistDetail(item.id)" >
-                        <p class="first-p">播放量 : {{item.playCount}}</p>
-                        <img v-lazy="item.coverImgUrl" alt="songLists">
-                        <p class="last-p">{{item.name}}</p>
-                    </li>                                                                                                                    
-                </ul>
-            </div>
-        </div>        
-      </div>
-        <Pagination :total="total" :pageSize="pageSize" :nowPage="page" @changePage="handleCurrentChange"/>
+      <!-- <Pagination :total="total" :pageSize="pageSize" :nowPage="page" @changePage="handleCurrentChange" /> -->
     </div>
   </div>
 </template>
 
 <script>
-import { highQualityAPI,songListAPI } from '@/utils/api'
+import { songListAPI } from '@/utils/api'
 import Pagination from '@/components/Pagination.vue'
 
 export default {
-  data(){
-    return{
-      highQuality:[],
-      songLists:[],
-      tabActive:'全部',
-      tabItems:['全部','欧美','华语','流行','说唱','摇滚','民谣','电子','轻音乐','影视原声','ACG','怀旧'],
-      total:0,
-      page:1,
-      pageSize: 10,
-      loading:true
+  data() {
+    return {
+      tableData: [],
+      songUrl: "",
+      loading: true
     }
   },
-  components: {
-    Pagination
+  created() {
+    this.onLoad()
   },
-  methods:{
-    toPlaylistDetail(id){
-        this.$router.push(`/playlist?id=${id}`)
-    },    
-    changeActive(item){
-      this.tabActive = item
-      this.page = 1
-      this.getHighQuality(item)
-      this.getSongLists(item) /* 不调用函数 也可以使用watch监听实现 */
-    },
-    getHighQuality(cat='全部'){
-        // 精品歌单
-        let params = {
-          limit : 1,
-          cat
-        }
-        highQualityAPI(params).then(res=>{
-          // console.log(res)
-          this.highQuality = res.data.playlists[0]
-        })
-    },
-    getSongLists(cat="全部"){
-      this.loading = true
-      // 歌单列表
-      let params = {
-        limit:10,
-        offset:(this.page-1)*10,
-        cat
-      }
-      songListAPI(params).then(res=>{
+  computed: {
+    musicQueue() {
+      return this.$store.state.musicQueue
+    }
+  },
+  methods: {
+    onLoad() {
+      songListAPI(1).then(res => {
         // console.log(res)
-        this.songLists = res.data.playlists
-        this.total = res.data.total /* 改变总页数 */
-        for(let i=0;i<this.songLists.length;i++){
-          if(this.songLists[i].playCount >= 100000)
-            this.songLists[i].playCount = parseInt(this.songLists[i].playCount/10000)+'万'
-        }     
-      }).then(()=>{
+        let resultList = res.data.slice(0, 50)
+        let songsList = []
+        for (const item of resultList) {
+          let duration = item.duration
+          // console.log(duration)
+          let min = parseInt(duration / 60).toString().padStart(2, '0')
+          let second = parseInt((duration - min * 60)).toString().padStart(2, '0')
+          duration = `${min}:${second}`
+          let song = {
+            id: item.sid,
+            songName: item.sname,
+            artistname: item.artistname,
+            artistid: item.artistid,
+            imgUrl: 1,
+            duration,
+            mp3Url: "http://music.163.com/song/media/outer/url?id=" + item.sid + ".mp3"
+          }
+          // console.log(song.mp3Url);
+          songsList.push(song)
+        }
+        this.tableData = songsList
+      }).then(() => {
         this.loading = false
       })
     },
-    handleCurrentChange(page){
-      // console.log(page)
-      this.page = page
-      this.getSongLists(this.tabActive)
-    }
-  },
-  created(){
-    this.getHighQuality()
-    this.getSongLists()      
+    toArtist(id) {
+      this.$router.push(`/artist?artistId=${id}`)
+    },
+    toAlbum(id) {
+      this.$router.push(`/album?id=${id}`)
+    },
+    play(row) {
+      let id = row.id
+      this.songUrl = "http://music.163.com/song/media/outer/url?id=" + id + ".mp3"
+
+      if (1) {
+        let musicInfo = {
+          imgUrl: 1,
+          artistname: row.artistname,
+          songName: row.songName,
+          artistId: row.artistid,
+          id: row.id,
+          duration: row.duration
+        }
+
+        this.$store.commit("changeMusicUrl", this.songUrl)
+        this.$store.commit("changeMusicInfo", musicInfo)
+        this.$store.commit("changeMusicStatus", false)
+        this.$store.commit("changeMusicQueue", musicInfo)
+        console.log("后");
+        let ids = []
+        for (const item of this.musicQueue) {
+          ids.push(item.id)
+        }
+        this.$store.commit("changeNowIndex", ids.indexOf(musicInfo.id))
+
+      } else {
+        this.$message({
+          showClose: true,
+          message: '对不起，歌曲暂时无法播放。',
+          type: 'error'
+        });
+      }
+
+    },
   }
 }
 </script>
 
 <style scoped>
-  ul {
-    list-style: none;
-  }
+ul {
+  list-style: none;
+}
 
-  .recommend {
-      max-width: 1300px;
-      margin: 0 auto;
-      padding: 20px;
-  }
+.new-songs {
+  max-width: 1300px;
+  margin: 0 auto;
+  padding: 20px;
+}
 
-  .top-card-wrap {
-    height: 250px;
-    padding: 20px;
-    position: relative;
-    z-index: 1;
-    box-sizing: border-box;
-    border-radius: 10px;
-    overflow: hidden;
-    display: flex;
-    align-items: center;
-  }
+.new-songs>>>.el-loading-spinner {
+  top: 50%;
+}
 
-  .bg-blur {
-    width: 100%;
-    height: 100%;
-    position: absolute;
-    top: 0;
-    left: 0;
-    filter: blur(20px);
-    z-index: 2;
-  }
+.el-table td,
+.el-table th.is-leaf {
+  border-bottom: none;
+}
 
-  .top-card {
-    display: flex;
-    position: absolute;
-    z-index: 3;
-  }
+.el-table::before {
+  opacity: 0;
+}
 
-  .img-wrap {
-    width: 200px;
-    height: 200px;
-  }
+.songs-table {
+  width: 100%;
+}
 
-  .img-wrap img {
-    width: 100%;
-    height: 100%;
-  }
+.img-wrap {
+  width: 60px;
+  height: 60px;
+  position: relative;
+}
 
-  .card-content {
-    flex: 1;
-    padding: 0 20px;
-  }
+.img-wrap img {
+  width: 100%;
+  height: 100%;
+  border-radius: 10px;
+}
 
-  .card-tag {
-    padding: 5px;
-    width: 100px;
-    box-sizing: border-box;
-    border: 1px solid #dfac67;
-    color: #dfac67;
-    text-align: center;
-    border-radius: 10px;
-    cursor: pointer;
-  }
-
-  .card-title {
-    color: #fff;
-    margin: 10px 0;
-  }
-
-  .card-info {
-    font-size: 12px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 8;
-    /* color: #888482; */
-    color: #e3e3e3;
-  }
-
-
-  /* tab导航 */
-  .tab-container {
-    margin-top: 20px;
-  }
-
-  .tab-bar ul {
-    height: 25px;
-    display: flex;
-    justify-content: flex-end;
-  }
-
-  .tab-item {
-    margin-left: 20px;
-    cursor: pointer;
-    font-size: 15px;
-    color: grey;
-  }
-
-  .active {
-    color: #dd6d60;
-  }
-
-  .tab-content {
-    margin-top: 20px;
-  }
-
-  .songs-wrap .list ul{
-      width: 100%;
-      display: flex;
-      justify-content: space-between;
-      flex-wrap: wrap;
-  }
-
-  .songs-wrap .list li {
-      width: 18%;
-      margin: 10px 0;
-      position: relative;
-      overflow-y: hidden;
-  }
-
-  .list li .first-p {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      background-color: rgba(0, 0, 0, .5);
-      color: #fff;
-      font-size: 12px;
-      padding: 5px;
-      box-sizing: border-box;
-      /* border-top-left-radius: 10px;
-      border-top-right-radius: 10px; */
-      transform: translateY(-100%);;
-      transition: .5s;
-  }
-
-  .list li::before {
-      content: "\e665"; 
-      position: absolute;
-      bottom: 25px;
-      right: 5px;
-      width: 35px;
-      height: 35px;
-      background-color: rgba(255, 255, 255, .8);
-      border-radius: 50%;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      color: #c0392b;
-      opacity: 0;
-      transition: .3s;
-      cursor: pointer;
-  }
-
-  .list li:hover .first-p{
-      transform: translateY(0);
-  }
-
-    .list li:hover::before{
-        opacity: 1;
-  }
-
-  .songs-wrap ul img {
-      width: 100%;
-      border-radius: 5px;
-      /* opacity: 1; */
-  }
-
-  .songs-wrap ul .last-p {
-      font-size: 14px;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-  } 
+.img-wrap p::before {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 30px;
+  height: 30px;
+  background-color: rgba(255, 255, 255, .8);
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #c0392b;
+  font-size: 14px;
+  cursor: pointer;
+}
 </style>

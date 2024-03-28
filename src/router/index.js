@@ -11,53 +11,57 @@ VueRouter.prototype.push = function push(to) {
 
 const routes = [
   {
-    path:"/",
-    redirect:'/discover'
+    path: "/",
+    redirect: '/discover'
   },
   {
-    path:"/discover",
+    path: "/discover",
     component: () => import('@/views/Discover/Discover.vue'),
     meta: {
       keepAlive: true
     }
   },
   {
-    path:"/recommend",
+    path: "/recommend",
     component: () => import('@/views/Recommend/Recommend.vue'),
     meta: {
-      keepAlive:true,
+      keepAlive: true,
     }
   },
   {
-    path:"/newsongs",
+    path: "/newsongs",
     component: () => import('@/views/NewSongs/NewSongs.vue'),
   },
   {
-    path:"/mvs",
+    path: "/mvs",
     component: () => import('@/views/MVs/MVs.vue'),
     meta: {
       keepAlive: true
     }
   },
   {
-    path:'/result',
+    path: '/result',
     component: () => import('@/views/Result/Result.vue'),
   },
   {
-    path:'/playlist',
+    path: '/playlist',
     component: () => import('@/views/Playlist/Playlist.vue'),
   },
   {
-    path:'/mvdetail',
+    path: '/mvdetail',
     component: () => import('@/views/MvDetail/MvDetail.vue')
   },
   {
-    path:'/artist',
+    path: '/artist',
     component: () => import('@/views/Artist/Artist.vue')
   },
   {
-    path:'/album',
+    path: '/comment',
     component: () => import('@/views/Album/Album.vue')
+  },
+  {
+    path: '/userinfo',
+    component: () => import('@/views/Userinfo/Userinfo.vue')
   }
 ]
 

@@ -5,16 +5,16 @@ import mutations from './mutation'
 Vue.use(Vuex)
 
 const store = new Vuex.Store({
-    state:{
-        globalMusicUrl:"",
-        globalMusicInfo:{},
-        globalCurrentTime:0,
-        isMusicPaused:true,
-        musicQueue:[],
-        nowIndex:0,
-        deleteToNext:false,
-        queuePos:{},
-        queueStyle:'normal',
+    state: {
+        globalMusicUrl: "",
+        globalMusicInfo: {},
+        globalCurrentTime: 0,
+        isMusicPaused: true,
+        musicQueue: [],
+        nowIndex: 0,
+        deleteToNext: false,
+        queuePos: {},
+        queueStyle: 'normal',
     },
     mutations
 })
